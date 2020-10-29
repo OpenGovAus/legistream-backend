@@ -10,14 +10,12 @@ class Stream(object):
     
     def __read_playlist(self, input_url):
         playlist_data = m3u8.loads(get(input_url).text)
-        self.stream_url = 'http://video.dpa.act.gov.au/live/amlst:aod-recording/' + playlist_data.data['playlists'][2]['uri']
+        self.lower_stream_url = 'http://video.dpa.act.gov.au/live/amlst:aod-recording/' + playlist_data.data['playlists'][2]['uri']
         
 
     @property
     def is_live(self):
-        if(get(self.stream_url).status_code == 404):
+        if(get(self.lower_stream_url).status_code == 404):
             return(False)
         else:
             return(True)
-
-print(Stream().stream_url)
