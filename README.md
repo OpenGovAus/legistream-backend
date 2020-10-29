@@ -8,8 +8,9 @@ This package uses different modules to get live stream data from the various Aus
 
 **Currently supported parliaments:**
 
-- Federal
 - Australian Capital Territory
+- Federal
+- Tasmania
 - Victoria
 
 ### Setup
