@@ -1,5 +1,5 @@
 import pytest
-from legistream_backend.act_stream import Stream
+from legistream_backend.act import Stream
 
 def test_act():
     stream_data = Stream()
