@@ -38,5 +38,3 @@ class Stream(object):
             return False
         else:
             return True
-
-print(Stream().lower_is_live)
