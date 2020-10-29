@@ -2,37 +2,30 @@ import json
 import m3u8
 import http.cookiejar
 from requests import get
+from bs4 import BeautifulSoup
 
-api_url = ['https://api-v3.switchmedia.asia/277/assets/get-data?asset=11725', '&detail=verbose&format=json']
-stream_base_url = 'https://dps-live-hls.global.ssl.fastly.net/hls/'
 refer_url = 'https://api-v3.switchmedia.asia/'
+api_url = [refer_url + '277/assets/get-data?asset=11725', '&detail=verbose&format=json']
+stream_base_url = 'https://dps-live-hls.global.ssl.fastly.net/hls/'
 num_range = range(68, 71)
-
-headers={
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36',
-    'Referer': 'https://api-v3.switchmedia.asia/switch.tv/vcms/wrapper.html.php?videoID=1172568&siteID=277&autoplay=true',
-    'Host': 'dps-live-hls.global.ssl.fastly.net',
-    'Sec-Fetch-Site': 'cross-site',
-    'Connection': 'keep-alive',
-    'Accept-Language': 'en-AU,en-GB;q=0.9,en-US;q=0.8,en;q=0.7',
-    'Accept-Encoding': 'gzip, deflate, br',
-    'Accept': '*/*'
-}
-
-# print(json.dumps(headers, indent=2))
+page_soup = BeautifulSoup(get('https://www.aph.gov.au/Watch_Read_Listen').text, 'lxml')
 
 class Stream(object):
     def __init__(self):
         self.__get_stream_urls()
     
     def __get_stream_urls(self):
+        self.sittings = []
+        self.sitting_div = page_soup.find('div', {'id': 'content'}).find_all('p', {'class': 'watch-live text-center'})
+        for row in self.sitting_div:
+            self.sittings.append(row.text.strip())
         for asset_id in num_range:
             json_data = json.loads(get(api_url[0] + str(asset_id) + api_url[1]).text)[0]
             prefix_id = json_data['image'].replace('https://downloads.switchmedia.asia/filestore/getimage.php?siteID=', '')[:3]
             # prefix_id = '277'
             stream_id = json_data['title'][-3:]
             house_id = json_data['synopsis'].replace('Live Stream: ', '')[:3]
-            url_suffix = prefix_id + '_' + house_id + '_' + stream_id + '_1800_01.m3u8'
+            url_suffix = prefix_id + '_' + house_id + stream_id + '_18000_01.m3u8'
             url = stream_base_url + url_suffix
             if(house_id == 'HOR'):
                 self.lower_stream_url = url
@@ -45,9 +38,25 @@ class Stream(object):
 
     @property
     def lower_is_live(self):
-        stat = get(self.lower_stream_url, headers=headers)
-        print(json.dumps(dict(stat.headers), indent=2))
-        #if(stat.strip()[-22:] == '#EXT-X-MEDIA-SEQUENCE:'):
-         #   return(False)
-        #else:
-         #   return(True)
+        if(self.sittings[0] == 'Not sitting'):
+           return(False)
+        else:
+           return(True)
+        
+    @property
+    def upper_is_live(self):
+        if(self.sittings[2] == 'Not sitting'):
+           return(False)
+        else:
+           return(True)
+    
+    @property
+    def committee_is_live(self):
+        if(self.sittings[1] == 'Not sitting'):
+           return(False)
+        else:
+           return(True)
+    
+    @property
+    def stream_urls(self):
+        return {'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committee_stream_url}
