@@ -16,7 +16,26 @@ This package uses different modules to get live stream data from the various Aus
 ### Setup
 
 Install required packages with **pip3**:
+
 `pip3 install -r requirements.txt`
+
+---
+
+Install **ffmpeg**:
+
+#### Linux
+
+`sudo apt install ffmpeg`
+
+#### Mac
+
+Install with **brew**:
+
+`brew install ffmpeg`
+
+#### Windows
+
+Official Windows builds of **ffmpeg** can be found [here](https://ffmpeg.org/download.html#build-windows)
 
 ### Print out stream URLs:
 
