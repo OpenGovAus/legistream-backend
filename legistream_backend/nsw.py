@@ -63,6 +63,10 @@ class Stream(object):
         except:
             return(False)
 
+    @property
+    def stream_urls(self):
+        return({'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committe_stream_url, 'jubilee': self.jubilee_stream_url})
+
     def __get_stream_url(self, input_num):
         stream_id = str(self.parsed_data[input_num]['id'])
         stream_json_data = json.loads(get(data_json + stream_id + info_suffix).text)
