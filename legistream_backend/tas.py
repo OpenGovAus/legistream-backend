@@ -1,12 +1,14 @@
 import io
 import os
+import sys
 import m3u8
-import json
 import subprocess
 import imagehash
 from PIL import Image
 from datetime import datetime
 from requests import get
+
+operating_system = sys.platform
 
 filepath = os.path.dirname(os.path.realpath(__file__))
 
@@ -38,15 +40,24 @@ class Stream(object):
 
     def __get_vid_hash(self, input_url, base_url):
         try:
+            if(operating_system != 'win32'):
+                root_dir = '/tmp/'
+            else:
+                root_dir = 'C:/temp/'
             playlist_data = m3u8.loads(get(input_url).text)
             seg_uri = m3u8.loads(get(base_stream_url + base_url + playlist_data.data['playlists'][0]['uri']).text).data['segments'][-1]['uri']
             seg_ts = get(base_stream_url + base_url + seg_uri)
-            # I need to add code for Windows/Mac here, please do not create a bug request abt it...
             current_time = str(datetime.now()).replace(':', '-').replace('.', '-').replace(' ', '_')
-            seg_output_file = '/tmp/' + current_time + '_seg.ts'
+            seg_output_file = root_dir + current_time + '_seg.ts'
             open(seg_output_file, 'wb').write(seg_ts.content)
-            img_out = '/tmp/' + current_time + '_seg_out.png'
-            subprocess.run(['ffmpeg', '-ss', '00:00:00', '-i', seg_output_file, '-frames:v', '1', img_out], capture_output=True)
+            img_out = root_dir + current_time + '_seg_out.png'
+            
+            command = ['-ss', '00:00:00', '-i', seg_output_file, '-frames:v', '1', img_out]
+            if(operating_system != 'win32'):
+                subprocess.run(['ffmpeg'] + command, capture_output=True)
+            else:
+                subprocess.run(['ffmpeg.exe'] + command, capture_output=True)
+            
             return(imagehash.average_hash((Image.open(img_out))))
         except:
             raise Exception('Invalid input URL: ' + input_url)
