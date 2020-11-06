@@ -11,6 +11,7 @@ This package uses different modules to get live stream data from the various Aus
 - Australian Capital Territory
 - Federal
 - New South Wales
+- South Australia
 - Tasmania
 - Victoria
 
@@ -66,3 +67,7 @@ if(Stream().lower_is_live):
 else:
     print('The lower house of Victoria is not currently live.')
 ```
+
+## Notes
+
+The South Australia stream extractor uses code adapted from the [streamlink ustreamtv implementation](https://github.com/streamlink/streamlink/blob/master/src/streamlink/plugins/ustreamtv.py).
