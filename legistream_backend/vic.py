@@ -1,8 +1,6 @@
 import m3u8
 from requests import get
 
-
-
 streams = ['https://pov_broadcast-i.akamaihd.net/hls/live/250374/pov-desk-la/master_900.m3u8',
            'https://pov_broadcast-i.akamaihd.net/hls/live/250376/pov-desk-lc/master_900.m3u8',
            'https://pov_broadcast-i.akamaihd.net/hls/live/250375/pov-desk-comm/master_900.m3u8']
