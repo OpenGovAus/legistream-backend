@@ -2,6 +2,14 @@
 
 This is the Python backend for legistream.
 
+---
+
+Install with **pip**:
+
+`pip install legistream-backend`
+
+View project on PyPI: [https://pypi.org/project/legistream-backend/](https://pypi.org/project/legistream-backend/).
+
 ## Usage
 
 This package uses different modules to get live stream data from the various Australian parliaments.
