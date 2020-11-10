@@ -22,6 +22,7 @@ This package uses different modules to get live stream data from the various Aus
 - South Australia
 - Tasmania
 - Victoria
+- Western Australia
 
 ### Setup
 
