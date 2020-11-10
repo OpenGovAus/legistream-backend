@@ -78,5 +78,3 @@ class Stream(object):
                 except:
                     res = get(stream_json_data['secure_m3u8_url'], allow_redirects=True)
                     return res.url
-
-print(Stream().lower_stream_url)
