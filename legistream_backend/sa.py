@@ -47,7 +47,10 @@ class Stream(object):
         return({'lower': self.lower_stream_url, 'upper': self.upper_stream_url})
 
     def __get_stream_status(self, stream_id):
-        return(bool(self.__get_stream_json(stream_id)['contentAvailable']))
+        try:
+            return(bool(self.__get_stream_json(stream_id)['contentAvailable']))
+        except:
+            return(False)
         
 
     def __get_stream_json(self, stream_id):
