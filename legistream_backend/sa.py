@@ -79,5 +79,3 @@ class Stream(object):
             return(stream_dat['args'][0]['stream'])
         except:
             raise Exception(args)
-
-Stream().lower_stream_url
