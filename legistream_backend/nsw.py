@@ -17,15 +17,15 @@ class Stream(object):
     
     @property
     def lower_stream_url(self):
-        return(self.__get_stream_url(2))
+        return(self.__get_stream_url(3))
 
     @property
     def upper_stream_url(self):
-        return(self.__get_stream_url(1))
+        return(self.__get_stream_url(2))
     
     @property
     def committe_stream_url(self):
-        return(self.__get_stream_url(3))
+        return(self.__get_stream_url(1))
     
     @property
     def jubilee_stream_url(self):
