@@ -17,19 +17,19 @@ class Stream(object):
     
     @property
     def lower_stream_url(self):
-        return(self.__get_stream_url(3))
+        return(self.__get_stream_url('Legislative Assembly'))
 
     @property
     def upper_stream_url(self):
-        return(self.__get_stream_url(2))
+        return(self.__get_stream_url('Legislative Council'))
     
     @property
     def committe_stream_url(self):
-        return(self.__get_stream_url(1))
+        return(self.__get_stream_url('Macquarie Room'))
     
     @property
     def jubilee_stream_url(self):
-        return(self.__get_stream_url(0))
+        return(self.__get_stream_url('Jubilee Room'))
 
     @property
     def jubilee_is_live(self):
@@ -67,12 +67,16 @@ class Stream(object):
     def stream_urls(self):
         return({'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committe_stream_url, 'jubilee': self.jubilee_stream_url})
 
-    def __get_stream_url(self, input_num):
-        stream_id = str(self.parsed_data[input_num]['id'])
-        stream_json_data = json.loads(get(data_json + stream_id + info_suffix).text)
-        try:
-            stream_json_data['name']
-            return ''
-        except:
-            res = get(stream_json_data['secure_m3u8_url'], allow_redirects=True)
-            return res.url
+    def __get_stream_url(self, input_title):
+        for stream in self.parsed_data:
+            if(input_title == stream['full_name']):
+                stream_id = str(stream['id'])
+                stream_json_data = json.loads(get(data_json + stream_id + info_suffix).text)
+                try:
+                    stream_json_data['name']
+                    return ''
+                except:
+                    res = get(stream_json_data['secure_m3u8_url'], allow_redirects=True)
+                    return res.url
+
+print(Stream().lower_stream_url)
