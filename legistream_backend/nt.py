@@ -17,5 +17,3 @@ class Stream(object):
         if(self.lower_is_live):
             playlist_data = m3u8.parse(get(stream_url).text)
             # I can't code the rest of this until the NT goes live
-
-print(Stream().lower_is_live)
