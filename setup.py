@@ -7,7 +7,7 @@ long_description = (here / 'README.md').read_text(encoding='utf-8')
 
 setup(
     name='legistream-backend',
-    version='0.7.0',
+    version='0.9.1',
     description='Get live stream metadata from the various Australian parliaments.',
     long_description=long_description,
     long_description_content_type='text/markdown',
