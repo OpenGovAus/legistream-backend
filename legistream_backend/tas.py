@@ -19,10 +19,19 @@ upper_base_url = 'LC/legco_360p/'
 class Stream(object):
     lower_img_hash = imagehash.average_hash(Image.open(filepath + '/tas_img/ha_adjourned.png'))
     upper_img_hash = imagehash.average_hash(Image.open(filepath + '/tas_img/lc_adjourned.png'))
-    def __init__(self):
-        self.lower_stream_url = base_stream_url + lower_base_url + 'playlist.m3u8'
-        self.upper_stream_url = base_stream_url + upper_base_url + 'playlist.m3u8'
-        self.stream_urls = {'lower': self.lower_stream_url, 'upper': self.upper_stream_url}
+
+    @property
+    def lower_stream_url(self):
+        return(base_stream_url + lower_base_url + 'playlist.m3u8')
+
+    @property
+    def upper_stream_url(self):
+        return(base_stream_url + upper_base_url + 'playlist.m3u8')
+
+    @property
+    def stream_urls(self):
+        return({'lower': self.lower_stream_url, 'upper': self.upper_stream_url})
+
 
     @property
     def lower_is_live(self):
