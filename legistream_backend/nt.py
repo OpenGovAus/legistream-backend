@@ -1,19 +1,23 @@
-import m3u8
 from requests import get
 
-stream_url = 'https://pbs1.nt.gov.au/HLS/SDPull/playlist.m3u8'
+stream_url = 'http://pbs1.nt.gov.au/HLS/HDPull/playlist.m3u8'
 
 class Stream(object):
     @property
     def lower_is_live(self):
         try:
-            raw_m3u8 = get(stream_url).text
+            get(stream_url)
             return True
         except:
             return False
 
     @property
-    def lower_stream_urls(self):
+    def lower_stream_url(self):
         if(self.lower_is_live):
-            playlist_data = m3u8.parse(get(stream_url).text)
-            # I can't code the rest of this until the NT goes live
+            return stream_url
+        else:
+            return ''
+
+    @property
+    def stream_urls(self):
+        return({'lower': self.lower_stream_url})
