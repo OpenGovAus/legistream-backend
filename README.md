@@ -20,6 +20,7 @@ This package uses different modules to get live stream data from the various Aus
 - Federal
 - New South Wales
 - Northern Territory
+- Queensland
 - South Australia
 - Tasmania
 - Victoria
