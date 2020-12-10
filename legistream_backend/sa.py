@@ -1,6 +1,5 @@
 import json
 import random
-import requests
 from websocket import create_connection
 
 lower_stream_id = '23181491'

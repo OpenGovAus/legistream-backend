@@ -34,5 +34,3 @@ class Stream(object):
     def stream_urls(self):
         if(self.is_live):
             return {self.stream_title: self.stream_url}
-
-print(Stream().stream_title)

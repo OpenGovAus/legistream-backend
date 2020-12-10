@@ -1,7 +1,5 @@
 from typing import Text
 import m3u8
-import json
-from requests.api import head
 import urllib3
 from bs4 import BeautifulSoup
 from requests import get

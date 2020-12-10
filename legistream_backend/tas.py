@@ -1,6 +1,4 @@
-import io
 import os
-import sys
 import m3u8
 import subprocess
 import imagehash

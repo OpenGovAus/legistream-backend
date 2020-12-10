@@ -1,4 +1,4 @@
-import m3u8, json, subprocess, imagehash, os
+import m3u8, subprocess, imagehash, os
 from PIL import Image
 from requests import get
 from datetime import datetime

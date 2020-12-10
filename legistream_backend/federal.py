@@ -1,6 +1,4 @@
 import json
-import m3u8
-import http.cookiejar
 from requests import get
 from bs4 import BeautifulSoup
 
