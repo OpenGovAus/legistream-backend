@@ -10,14 +10,18 @@ class Stream(object):
     def is_live(self):
         try:
             self.m3u8_data = m3u8.parse(get(MASTER_URL).text)
-            return True
+            if(self.m3u8_data['playlists']):
+                return True
+            else:
+                return False
         except:
             return False
 
     @property
     def stream_url(self):
         if(self.is_live):
-            return(self.m3u8_data['playlists'][-1]['uri'])
+            print(self.m3u8_data)
+            #return(self.m3u8_data['playlists'][-1]['uri'])
         else:
             return ''
 
@@ -29,8 +33,12 @@ class Stream(object):
                 return(soup.find_all('h3')[-1].text.strip())
             except:
                 return ''
+        else:
+            return ''
 
     @property
     def stream_urls(self):
         if(self.is_live):
             return {self.stream_title: self.stream_url}
+        else:
+            return {}
