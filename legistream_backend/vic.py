@@ -37,24 +37,33 @@ class Stream(object):
 
     @property
     def lower_is_live(self):
-        if(self.lower_img_hash - self.__check_img(0) < 5):
-            return False
-        else:
-            return True
+        try:
+            if(self.lower_img_hash - self.__check_img(0) < 5):
+                return False
+            else:
+                return True
+        except:
+            False
         
     @property
     def upper_is_live(self):
-        if(self.upper_img_hash - self.__check_img(1) < 5):
+        try:
+            if(self.upper_img_hash - self.__check_img(1) < 5):
+                return False
+            else:
+                return True
+        except:
             return False
-        else:
-            return True
         
     @property
     def committee_is_live(self):
-        if(get(self.committee_stream_url[:-15] + 'master_400.m3u8').status_code == 404):
+        try:
+            if(get(self.committee_stream_url[:-15] + 'master_400.m3u8').status_code == 404):
+                return False
+            else:
+                return True
+        except:
             return False
-        else:
-            return True
 
     def __check_img(self, house):
         if(isinstance(house, int)):
