@@ -43,7 +43,7 @@ class Stream(object):
             else:
                 return True
         except:
-            False
+            return False
         
     @property
     def upper_is_live(self):
