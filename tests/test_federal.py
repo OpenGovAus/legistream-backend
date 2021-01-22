@@ -6,4 +6,5 @@ def test_federal():
     print('\nHOR stream status: ' + str(fed_stream.lower_is_live))
     print('Senate stream status: ' + str(fed_stream.upper_is_live))
     print('Commitee stream status: ' + str(fed_stream.committee_is_live))
+    print('Extra committees: ' + str(fed_stream.com_urls))
     print(fed_stream.stream_urls)

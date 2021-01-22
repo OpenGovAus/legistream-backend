@@ -1,4 +1,4 @@
-import json
+import json, re
 from requests import get
 from bs4 import BeautifulSoup
 
@@ -10,8 +10,20 @@ page_soup = BeautifulSoup(get('https://www.aph.gov.au/Watch_Read_Listen').text, 
 
 class Stream(object):
     def __init__(self):
+        self.__scrape_committees()
         self.__get_stream_urls()
     
+    def __scrape_committees(self):
+        live_pages = []
+        self.com_urls = []
+        chk_list = BeautifulSoup(get('https://www.aph.gov.au/Watch_Read_Listen').text, 'lxml').find('section', {'id': 't1-content-panel'}).find_all('div', {'class': 'medium-7 columns'})
+        for entry in chk_list:
+            if(entry.text.strip()[-4:] == 'Live'):
+                live_pages.append('https://www.aph.gov.au' + entry.find('a')['onclick'][13:][:75])
+        for url in live_pages:
+            self.com_urls.append(json.loads(get('https://api-v3.switchmedia.asia/277/playback/getUniversalPlayerConfig?videoID=' + BeautifulSoup(get(url).text, 'lxml').find('iframe')['src'][72:][:7] + '&playlistID=0&skinType=vcms&profile=regular&playerID=playerregular&format=json&bookmarkID=0&autoplay=true&referrer=https://www.aph.gov.au/News_and_Events/LiveMediaPlayer&siteID=277&cl=1').text)['media']['renditions'][0]['url'])
+
+
     def __get_stream_urls(self):
         self.sittings = []
         self.sitting_div = page_soup.find('div', {'id': 'content'}).find_all('p', {'class': 'watch-live text-center'})
@@ -23,7 +35,7 @@ class Stream(object):
             # prefix_id = '277'
             stream_id = json_data['title'][-3:]
             house_id = json_data['synopsis'].replace('Live Stream: ', '')[:3]
-            url_suffix = prefix_id + '_' + house_id + stream_id + '_18000_01.m3u8'
+            url_suffix = prefix_id + '_' + house_id + stream_id + '_18000.m3u8'
             url = stream_base_url + url_suffix
             if(house_id == 'HOR'):
                 self.lower_stream_url = url
@@ -50,11 +62,13 @@ class Stream(object):
     
     @property
     def committee_is_live(self):
-        if(self.sittings[1] == 'Not sitting'):
+        if(self.sittings[1] == 'Not sitting' and not 'https://dps-live-hls.global.ssl.fastly.net/hls/277_COM109_18000.m3u8' in self.com_urls):
            return(False)
         else:
            return(True)
     
     @property
     def stream_urls(self):
-        return {'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committee_stream_url}
+        return {'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committee_stream_url, 'extra_committees': self.com_urls}
+
+Stream()
