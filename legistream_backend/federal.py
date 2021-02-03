@@ -24,9 +24,13 @@ class Stream(object):
                     pass
                 else:
                     live_pages.append('https://www.aph.gov.au' + entry.find('a')['onclick'][13:][:75])
-        for url in live_pages:
-            self.com_urls.append(json.loads(get('https://api-v3.switchmedia.asia/277/playback/getUniversalPlayerConfig?videoID=' + BeautifulSoup(get(url).text, 'lxml').find('iframe')['src'][72:][:7] + '&playlistID=0&skinType=vcms&profile=regular&playerID=playerregular&format=json&bookmarkID=0&autoplay=true&referrer=https://www.aph.gov.au/News_and_Events/LiveMediaPlayer&siteID=277&cl=1').text)['media']['renditions'][0]['url'])
-
+        if(not len(live_pages) == 0):
+            for url in live_pages:
+                try:
+                    self.com_urls.append(json.loads(get('https://api-v3.switchmedia.asia/277/playback/getUniversalPlayerConfig?videoID=' + BeautifulSoup(get(url).text, 'lxml').find('iframe')['src'][72:][:7] + '&playlistID=0&skinType=vcms&profile=regular&playerID=playerregular&format=json&bookmarkID=0&autoplay=true&referrer=https://www.aph.gov.au/News_and_Events/LiveMediaPlayer&siteID=277&cl=1').text)['media']['renditions'][0]['url'])
+                except:
+                    # This happens with audio-only streams, which Legistream doesn't support yet...
+                    pass
     def __get_stream_urls(self):
         self.sittings = []
         self.sitting_div = page_soup.find('div', {'id': 'content'}).find_all('p', {'class': 'watch-live text-center'})
