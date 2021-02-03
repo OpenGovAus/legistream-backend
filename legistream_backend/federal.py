@@ -10,19 +10,22 @@ page_soup = BeautifulSoup(get('https://www.aph.gov.au/Watch_Read_Listen').text, 
 
 class Stream(object):
     def __init__(self):
-        self.__scrape_committees()
         self.__get_stream_urls()
-    
+        self.__scrape_committees()
+
     def __scrape_committees(self):
         live_pages = []
         self.com_urls = []
         chk_list = BeautifulSoup(get('https://www.aph.gov.au/Watch_Read_Listen').text, 'lxml').find('section', {'id': 't1-content-panel'}).find_all('div', {'class': 'medium-7 columns'})
         for entry in chk_list:
             if(entry.text.strip()[-4:] == 'Live'):
-                live_pages.append('https://www.aph.gov.au' + entry.find('a')['onclick'][13:][:75])
+                _stream_title = entry.text.strip()[:-4].strip()
+                if(_stream_title == 'Senate' or _stream_title == 'House of Representatives' or _stream_title == 'Federation Chamber'):
+                    pass
+                else:
+                    live_pages.append('https://www.aph.gov.au' + entry.find('a')['onclick'][13:][:75])
         for url in live_pages:
             self.com_urls.append(json.loads(get('https://api-v3.switchmedia.asia/277/playback/getUniversalPlayerConfig?videoID=' + BeautifulSoup(get(url).text, 'lxml').find('iframe')['src'][72:][:7] + '&playlistID=0&skinType=vcms&profile=regular&playerID=playerregular&format=json&bookmarkID=0&autoplay=true&referrer=https://www.aph.gov.au/News_and_Events/LiveMediaPlayer&siteID=277&cl=1').text)['media']['renditions'][0]['url'])
-
 
     def __get_stream_urls(self):
         self.sittings = []
@@ -69,6 +72,10 @@ class Stream(object):
     
     @property
     def stream_urls(self):
-        return {'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committee_stream_url, 'extra_committees': self.com_urls}
-
-Stream()
+        data_dict = {'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committee_stream_url, 'extra_committees': self.com_urls}
+        for entry in data_dict:
+            if(data_dict[entry] in data_dict['extra_committees']):
+                data_dict['extra_committees'].remove(data_dict[entry])
+        if(len(data_dict['extra_committees']) == 0):
+            data_dict.pop('extra_committees', None)
+        return data_dict
