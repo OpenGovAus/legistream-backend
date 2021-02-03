@@ -33,21 +33,26 @@ class Stream(object):
 
     @property
     def lower_is_live(self):
-        if(self.lower_img_hash - self.__get_vid_hash(self.lower_stream_url, lower_base_url) < 5):
-            return(False)
+        if(get(self.lower_stream_url).status_code != 200):
+            return False
         else:
-            return(True)
+            if(self.lower_img_hash - self.__get_vid_hash(self.lower_stream_url, lower_base_url) < 5):
+                return(False)
+            else:
+                return(True)
         
     @property
     def upper_is_live(self):
-        if(self.upper_img_hash - self.__get_vid_hash(self.upper_stream_url, upper_base_url) < 5):
-            return(False)
+        if(get(self.upper_stream_url).status_code != 200):
+            return False
         else:
-            return(True)
+            if(self.upper_img_hash - self.__get_vid_hash(self.upper_stream_url, upper_base_url) < 5):
+                return(False)
+            else:
+                return(True)
 
     def __get_vid_hash(self, input_url, base_url):
         try:
-            
             playlist_data = m3u8.loads(get(input_url).text)
             seg_uri = m3u8.loads(get(base_stream_url + base_url + playlist_data.data['playlists'][0]['uri']).text).data['segments'][-1]['uri']
             seg_ts = get(base_stream_url + base_url + seg_uri)
