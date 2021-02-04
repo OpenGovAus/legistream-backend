@@ -23,11 +23,11 @@ class Stream(object):
                 if(_stream_title == 'Senate' or _stream_title == 'House of Representatives' or _stream_title == 'Federation Chamber'):
                     pass
                 else:
-                    live_pages.append('https://www.aph.gov.au' + entry.find('a')['onclick'][13:][:75])
+                    live_pages.append({'title': entry.text.strip()[:-4].strip(),'url': 'https://www.aph.gov.au' + entry.find('a')['onclick'][13:][:75]})
         if(not len(live_pages) == 0):
             for url in live_pages:
                 try:
-                    self.com_urls.append(json.loads(get('https://api-v3.switchmedia.asia/277/playback/getUniversalPlayerConfig?videoID=' + BeautifulSoup(get(url).text, 'lxml').find('iframe')['src'][72:][:7] + '&playlistID=0&skinType=vcms&profile=regular&playerID=playerregular&format=json&bookmarkID=0&autoplay=true&referrer=https://www.aph.gov.au/News_and_Events/LiveMediaPlayer&siteID=277&cl=1').text)['media']['renditions'][0]['url'])
+                    self.com_urls.append({'title': url['title'], 'url': json.loads(get('https://api-v3.switchmedia.asia/277/playback/getUniversalPlayerConfig?videoID=' + BeautifulSoup(get(url['url']).text, 'lxml').find('iframe')['src'][72:][:7] + '&playlistID=0&skinType=vcms&profile=regular&playerID=playerregular&format=json&bookmarkID=0&autoplay=true&referrer=https://www.aph.gov.au/News_and_Events/LiveMediaPlayer&siteID=277&cl=1').text)['media']['renditions'][0]['url']})
                 except:
                     # This happens with audio-only streams, which Legistream doesn't support yet...
                     pass
