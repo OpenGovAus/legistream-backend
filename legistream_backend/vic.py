@@ -1,91 +1,59 @@
-import m3u8, subprocess, imagehash, os
-from PIL import Image
+import m3u8, json
 from requests import get
-from datetime import datetime
-from . import common
+from requests.sessions import SessionRedirectMixin
 
-filepath = os.path.dirname(os.path.realpath(__file__))
-
-upper_base_url = 'https://pov_broadcast-i.akamaihd.net/hls/live/250376/pov-desk-lc/'
-lower_base_url = 'https://pov_broadcast-i.akamaihd.net/hls/live/250374/pov-desk-la/'
-committee_base_url = 'https://pov_broadcast-i.akamaihd.net/hls/live/250375/pov-desk-comm/'
-suffix = 'master_900.m3u8'
-
-streams = [lower_base_url + suffix,
-           upper_base_url + suffix,
-           committee_base_url + suffix]
+API_URL = 'https://www.parliament.vic.gov.au/video-streaming/v7/scripts/akamai_desktop.json?_=1612478772960'
 
 class Stream(object):
-    lower_img_hash = imagehash.average_hash(Image.open(filepath + '/vic_img/la_adjourned.png'))
-    upper_img_hash = imagehash.average_hash(Image.open(filepath + '/vic_img/lc_adjourned.png'))
+    def __init__(self):
+        self.__get_api_data(API_URL)
+
+    def __get_api_data(self, url):
+        self.api_data = json.loads(get(url).text)
+    
+    def lower_stream(self):
+        return self.__get_stream('Assembly Live Broadcast - Desktop')
+
+    def upper_stream(self):
+        return self.__get_stream('Council Live Broadcast - Desktop')
+
+    def comm_stream(self):
+        return self.__get_stream('Committee Live Broadcast - Desktop')
+
+    def __get_stream(self, title):
+        for stream in self.api_data:
+            if(stream['title'] == title):
+                return stream
 
     @property
     def lower_stream_url(self):
-        return(streams[0])
-
-    @property
-    def upper_stream_url(self):
-        return(streams[1])
-    
-    @property
-    def committee_stream_url(self):
-        return(streams[2])
-
-    @property
-    def stream_urls(self):
-        return({'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committee_stream_url})
+        return('https://pov_broadcast-I.akamaihd.net/hls/live/250374-b/pov-desk-la/' + m3u8.parse(get(f'https:{self.lower_stream()["altsrc"]}').text)['playlists'][-1]['uri'])
 
     @property
     def lower_is_live(self):
-        try:
-            if(self.lower_img_hash - self.__check_img(0) < 5):
-                return False
-            else:
-                return True
-        except:
+        if(get(self.lower_stream_url).status_code != 200):
             return False
-        
+        else:
+            return True
+
+    @property
+    def upper_stream_url(self):
+        return 'https://pov_broadcast-i.akamaihd.net/hls/live/250376-b/pov-desk-lc/' + m3u8.parse(get(f'https:{self.upper_stream()["altsrc"]}').text)['playlists'][-1]['uri']
+
     @property
     def upper_is_live(self):
-        try:
-            if(self.upper_img_hash - self.__check_img(1) < 5):
-                return False
-            else:
-                return True
-        except:
+        if(get(self.upper_stream_url).status_code != 200):
             return False
-        
+        else:
+            return True
+
+    @property
+    def committee_stream_url(self):
+        return('https://pov_broadcast-I.akamaihd.net/hls/live/250375/pov-desk-comm/' + m3u8.parse(get(f'https:{self.comm_stream()["source"][0]["src"]}').text)['playlists'][-1]['uri']) 
+
     @property
     def committee_is_live(self):
-        try:
-            if(get(self.committee_stream_url[:-15] + 'master_400.m3u8').status_code == 404):
-                return False
-            else:
-                return True
-        except:
+        if(get(self.committee_stream_url).status_code != 200):
             return False
-
-    def __check_img(self, house):
-        if(isinstance(house, int)):
-            if(house == 0):
-                base = lower_base_url
-            elif(house == 1):
-                base = upper_base_url
-            elif(house == 2):
-                base = committee_base_url
-            else:
-                raise Exception('Chamber value out of range (0 - 2)')
-            seg = m3u8.parse(get(streams[house]).text)['segments'][-1]['uri']
-            current_time = str(datetime.now()).replace(':', '-').replace('.', '-').replace(' ', '_')
-            seg_output_file = common.root_dir + current_time + '_vic_seg.ts'
-            with open(seg_output_file, 'wb') as file:
-                file.write(get(base + seg).content)
-            
-            img_out = common.root_dir + current_time + '_vic_seg_out.png'
-            
-            command = ['-ss', '00:00:00', '-i', seg_output_file, '-frames:v', '1', img_out]
-            subprocess.run([common.ffmpeg_bin] + command, capture_output=True)
-            
-            return(imagehash.average_hash((Image.open(img_out))))
         else:
-            raise ValueError('house must be 0, 1, or 2.')
+            return True
