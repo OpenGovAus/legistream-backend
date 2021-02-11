@@ -49,11 +49,17 @@ class Stream(object):
 
     @property
     def committee_stream_url(self):
-        return('https://pov_broadcast-I.akamaihd.net/hls/live/250375/pov-desk-comm/' + m3u8.parse(get(f'https:{self.comm_stream()["source"][0]["src"]}').text)['playlists'][-1]['uri']) 
+        try:
+            return('https://pov_broadcast-I.akamaihd.net/hls/live/250375/pov-desk-comm/' + m3u8.parse(get(f'https:{self.comm_stream()["source"][0]["src"]}').text)['playlists'][-1]['uri']) 
+        except:
+            return None
 
     @property
     def committee_is_live(self):
-        if(get(self.committee_stream_url).status_code != 200):
+        try:
+            if(get(self.committee_stream_url).status_code != 200):
+                return False
+            else:
+                return True
+        except:
             return False
-        else:
-            return True
