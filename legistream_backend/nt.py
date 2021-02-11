@@ -1,16 +1,21 @@
+import m3u8, json
 from requests import get
 
-stream_url = 'http://pbs1.nt.gov.au/HLS/HDPull/playlist.m3u8'
+base = 'http://pbs1.nt.gov.au/HLS/HDPull/'
+stream_url = base + 'playlist.m3u8'
 
 class Stream(object):
     @property
     def lower_is_live(self):
-        try:
-            get(stream_url)
-            return True
-        except:
+        stream_segments = m3u8.parse(get(stream_url).text)['segments']
+        seg_lens = []
+        for i in range(3):
+            seg_lens.append(len(get(base + stream_segments[-(i + 1)]['uri']).content))
+        if(any(seg_lens.count(element) > 1 for element in seg_lens)):
             return False
-
+        else:
+            return True
+    
     @property
     def lower_stream_url(self):
         if(self.lower_is_live):
