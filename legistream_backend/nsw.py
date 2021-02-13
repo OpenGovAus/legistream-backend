@@ -1,4 +1,4 @@
-import json
+import json, m3u8
 from requests import get
 
 data_json = 'https://player-api.new.livestream.com/accounts/13067949/events/'
@@ -40,11 +40,16 @@ class Stream(object):
 
     @property
     def committee_is_live(self):
-        try:
-            get(self.committe_stream_url)
-            return(True)
-        except:
-            return(False)
+        playlist_uri = m3u8.parse(get(self.committe_stream_url).text)['playlists'][0]['uri']
+        segments= m3u8.parse(get(playlist_uri).text)['segments']
+        base_url = playlist_uri.split('/media')[0]
+        seg_lens = []
+        for i in range(3):
+            seg_lens.append(len(get(segments[-(i + 1)]['uri'].replace('..', base_url)).content))
+        if(any(seg_lens.count(element) > 1 for element in seg_lens)):
+            return False
+        else:
+            return True
         
     @property
     def lower_is_live(self):
