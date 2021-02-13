@@ -46,9 +46,10 @@ class Stream(object):
         seg_lens = []
         for i in range(4):
             seg_lens.append(len(get(segments[-(i + 1)]['uri'].replace('..', base_url)).content))
-        if(int(sum(seg_lens)/len(seg_lens)) in range(510232, 511300)):
+        if(all(elem in [511360, 510608, 510420, 511736, 510232, 510984, 510044, 510796, 511736, 509856, 511172, 511548]  for elem in seg_lens)):
             return False
         else:
+            print(seg_lens)
             return True
 
     @property
