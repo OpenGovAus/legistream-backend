@@ -44,7 +44,7 @@ class Stream(object):
         segments= m3u8.parse(get(playlist_uri).text)['segments']
         base_url = playlist_uri.split('/media')[0]
         seg_lens = []
-        for i in range(3):
+        for i in range(4):
             seg_lens.append(len(get(segments[-(i + 1)]['uri'].replace('..', base_url)).content))
         if(any(seg_lens.count(element) > 1 for element in seg_lens)):
             return False
