@@ -46,11 +46,11 @@ class Stream(object):
         seg_lens = []
         for i in range(4):
             seg_lens.append(len(get(segments[-(i + 1)]['uri'].replace('..', base_url)).content))
-        if(any(seg_lens.count(element) > 1 for element in seg_lens)):
+        if(int(sum(seg_lens)/len(seg_lens)) in range(510232, 511300)):
             return False
         else:
             return True
-        
+
     @property
     def lower_is_live(self):
         try:
