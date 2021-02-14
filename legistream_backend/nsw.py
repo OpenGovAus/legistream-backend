@@ -23,7 +23,7 @@ class Stream(object):
         return(self.__get_stream_url('Legislative Council'))
     
     @property
-    def committe_stream_url(self):
+    def committee_stream_url(self):
         return(self.__get_stream_url('Macquarie Room'))
     
     @property
@@ -40,17 +40,20 @@ class Stream(object):
 
     @property
     def committee_is_live(self):
-        playlist_uri = m3u8.parse(get(self.committe_stream_url).text)['playlists'][0]['uri']
-        segments= m3u8.parse(get(playlist_uri).text)['segments']
-        base_url = playlist_uri.split('/media')[0]
-        seg_lens = []
-        for i in range(4):
-            seg_lens.append(len(get(segments[-(i + 1)]['uri'].replace('..', base_url)).content))
-        if(all(elem in [511360, 510608, 510420, 511736, 510232, 510984, 510044, 510796, 511736, 509856, 511172, 511548]  for elem in seg_lens)):
+        try:
+            playlist_uri = m3u8.parse(get(self.committe_stream_url).text)['playlists'][0]['uri']
+            segments= m3u8.parse(get(playlist_uri).text)['segments']
+            base_url = playlist_uri.split('/media')[0]
+            seg_lens = []
+            for i in range(4):
+                seg_lens.append(len(get(segments[-(i + 1)]['uri'].replace('..', base_url)).content))
+            if(all(elem in [511360, 510608, 510420, 511736, 510232, 510984, 510044, 510796, 511736, 509856, 511172, 511548]  for elem in seg_lens)):
+                return False
+            else:
+                print(seg_lens)
+                return True
+        except:
             return False
-        else:
-            print(seg_lens)
-            return True
 
     @property
     def lower_is_live(self):
@@ -70,7 +73,7 @@ class Stream(object):
 
     @property
     def stream_urls(self):
-        return({'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committe_stream_url, 'jubilee': self.jubilee_stream_url})
+        return({'lower': self.lower_stream_url, 'upper': self.upper_stream_url, 'committee': self.committee_stream_url, 'jubilee': self.jubilee_stream_url})
 
     def __get_stream_url(self, input_title):
         for stream in self.parsed_data:

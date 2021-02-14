@@ -11,7 +11,7 @@ def test_nsw_stream_status():
 
 def test_nsw_stream_urls():
     print('\nJubilee: ' + nsw_stream.jubilee_stream_url)
-    print('Committee: ' + nsw_stream.committe_stream_url)
+    print('Committee: ' + nsw_stream.committee_stream_url)
     print('LA: ' + nsw_stream.lower_stream_url)
     print('LC: ' + nsw_stream.upper_stream_url)
     print(nsw_stream.stream_urls)
