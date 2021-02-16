@@ -27,7 +27,7 @@ class Stream(object):
 
     @property
     def lower_stream_url(self):
-        return('https://pov_broadcast-I.akamaihd.net/hls/live/250374-b/pov-desk-la/' + m3u8.parse(get(f'https:{self.lower_stream()["altsrc"]}').text)['playlists'][-1]['uri'])
+        return f'https:{self.lower_stream()["checksrc"]}'.replace('400', '900')
 
     @property
     def lower_is_live(self):
@@ -38,7 +38,7 @@ class Stream(object):
 
     @property
     def upper_stream_url(self):
-        return 'https://pov_broadcast-i.akamaihd.net/hls/live/250376-b/pov-desk-lc/' + m3u8.parse(get(f'https:{self.upper_stream()["altsrc"]}').text)['playlists'][-1]['uri']
+        return f'https:{self.upper_stream()["checksrc"]}'.replace('400', '900')
 
     @property
     def upper_is_live(self):
@@ -50,7 +50,7 @@ class Stream(object):
     @property
     def committee_stream_url(self):
         try:
-            return('https://pov_broadcast-I.akamaihd.net/hls/live/250375/pov-desk-comm/' + m3u8.parse(get(f'https:{self.comm_stream()["source"][0]["src"]}').text)['playlists'][-1]['uri']) 
+            return f'https:{self.comm_stream()["checksrc"]}'.replace('400', '900')
         except:
             return None
 
