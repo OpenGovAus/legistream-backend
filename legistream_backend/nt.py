@@ -18,10 +18,7 @@ class Stream(object):
     
     @property
     def lower_stream_url(self):
-        if(self.lower_is_live):
-            return stream_url
-        else:
-            return ''
+        return stream_url
 
     @property
     def stream_urls(self):
