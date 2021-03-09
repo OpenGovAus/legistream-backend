@@ -8,7 +8,11 @@ class Stream(object):
     @property
     def is_live(self):
         try:
-            self.m3u8_data = m3u8.parse(get(self.stream_url).text)
+            _m3u8 = get(self.stream_url)
+            if(_m3u8.status_code != 200):
+                return False
+
+            self.m3u8_data = m3u8.parse(_m3u8).text
             if(self.m3u8_data['playlists']):
                 return True
             else:
