@@ -27,25 +27,37 @@ class Stream(object):
 
     @property
     def lower_stream_url(self):
-        return f'https:{self.lower_stream()["checksrc"]}'.replace('400', '900')
+        try:
+            return f'https:{self.lower_stream()["checksrc"]}'.replace('400', '900')
+        except:
+            return None
 
     @property
     def lower_is_live(self):
-        if(get(self.lower_stream_url).status_code != 200):
+        try:
+            if(get(self.lower_stream_url).status_code != 200):
+                return False
+            else:
+                return True
+        except:
             return False
-        else:
-            return True
 
     @property
     def upper_stream_url(self):
-        return f'https:{self.upper_stream()["checksrc"]}'.replace('400', '900')
+        try:
+            return f'https:{self.upper_stream()["checksrc"]}'.replace('400', '900')
+        except:
+            return None
 
     @property
     def upper_is_live(self):
-        if(get(self.upper_stream_url).status_code != 200):
+        try:
+            if(get(self.upper_stream_url).status_code != 200):
+                return False
+            else:
+                return True
+        except:
             return False
-        else:
-            return True
 
     @property
     def committee_stream_url(self):
