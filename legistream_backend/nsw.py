@@ -1,5 +1,6 @@
 import json, m3u8
 from requests import get
+from bs4 import BeautifulSoup
 
 data_json = 'https://player-api.new.livestream.com/accounts/13067949/events/'
 info_suffix = '/stream_info'
@@ -14,6 +15,18 @@ class Stream(object):
     def __get_data(self, input_json):
         self.parsed_data = json.loads(get(input_json).text)['data']
     
+    @property
+    def are_streams(self):
+        _html = BeautifulSoup(get('https://www.parliament.nsw.gov.au/Pages/webcasts.aspx').text, 'lxml').find('div', {'class': 'webcast-links'})
+        try:
+            if(_html.find('p').text == 'There are no active webcasts, on sitting days see the Daily Program to determine when proceedings begin.'):
+                return False
+            else:
+                return True
+        except:
+            return True
+
+
     @property
     def lower_stream_url(self):
         return(self.__get_stream_url('Legislative Assembly'))
@@ -33,25 +46,20 @@ class Stream(object):
     @property
     def jubilee_is_live(self):
         try:
-            get(self.jubilee_stream_url)
-            return(True)
+            if(self.are_streams and get(self.jubilee_stream_url).status_code == 200):
+                return True
+            else:
+                return False
         except:
-            return(False)
+            return False
 
     @property
     def committee_is_live(self):
         try:
-            playlist_uri = m3u8.parse(get(self.committe_stream_url).text)['playlists'][0]['uri']
-            segments= m3u8.parse(get(playlist_uri).text)['segments']
-            base_url = playlist_uri.split('/media')[0]
-            seg_lens = []
-            for i in range(4):
-                seg_lens.append(len(get(segments[-(i + 1)]['uri'].replace('..', base_url)).content))
-            if(all(elem in [511360, 510608, 510420, 511736, 510232, 510984, 510044, 510796, 511736, 509856, 511172, 511548]  for elem in seg_lens)):
-                return False
-            else:
-                print(seg_lens)
+            if(self.are_streams and get(self.committee_stream_url).status_code == 200):
                 return True
+            else:
+                return False
         except:
             return False
 
@@ -59,17 +67,17 @@ class Stream(object):
     def lower_is_live(self):
         try:
             get(self.lower_stream_url)
-            return(True)
+            return True
         except:
-            return(False)
+            return False
         
     @property
     def upper_is_live(self):
         try:
             get(self.upper_stream_url)
-            return(True)
+            return True
         except:
-            return(False)
+            return False
 
     @property
     def stream_urls(self):
