@@ -8,9 +8,9 @@ from . import common
 filepath = os.path.dirname(os.path.realpath(__file__))
 
 class Stream(object):
-    lower_img_hash = imagehash.average_hash(Image.open(filepath + '/tas_img/ha_adjourned.png'))
-    upper_img_hash = imagehash.average_hash(Image.open(filepath + '/tas_img/lc_adjourned.png'))
-
+    lower_img_hash = 18446744069414592512
+    upper_img_hash = 18446743326385257472
+    
     @property
     def lower_stream_url(self):
         return BeautifulSoup(get('https://www.parliament.tas.gov.au/TBS/havideo.html').text, 'lxml').find('source')['src']
@@ -27,7 +27,7 @@ class Stream(object):
     @property
     def lower_is_live(self):
         try:
-            if(self.lower_img_hash - self.__get_vid_hash(self.lower_stream_url) < 5):
+            if(abs(self.lower_img_hash - self.__get_vid_hash(self.lower_stream_url)) < 5):
                 return(False)
             else:
                 return(True)
@@ -36,7 +36,7 @@ class Stream(object):
         
     @property
     def upper_is_live(self):
-        if(self.upper_img_hash - self.__get_vid_hash(self.upper_stream_url) < 5):
+        if(abs(self.upper_img_hash - self.__get_vid_hash(self.upper_stream_url)) < 5):
             return(False)
         else:
             return(True)
@@ -68,7 +68,7 @@ class Stream(object):
             
             command = ['-ss', '00:00:00', '-i', seg_output_file, '-frames:v', '1', img_out]
             subprocess.run([common.ffmpeg_bin] + command, capture_output=True)
-            _hash = imagehash.average_hash((Image.open(img_out)))
+            _hash = int(str(imagehash.average_hash((Image.open(img_out)))), 16)
             self.__cleanup(common.root_dir)
             return _hash
         except:

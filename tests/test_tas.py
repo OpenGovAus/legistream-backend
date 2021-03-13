@@ -4,12 +4,12 @@ from legistream_backend.tas import Stream
 
 def test_img_hashes():
     tas_stream = Stream()
-    if(isinstance(tas_stream.lower_img_hash, imagehash.ImageHash)):
+    if(isinstance(tas_stream.lower_img_hash, int)):
         print('\n' + str(tas_stream.lower_img_hash))
     else:
         raise Exception('Lower image hash was not a valid ImageHash object.')
 
-    if(isinstance(tas_stream.upper_img_hash, imagehash.ImageHash)):
+    if(isinstance(tas_stream.upper_img_hash, int)):
         print(tas_stream.upper_img_hash)
     else:
         raise Exception('Upper image hash was not a valid ImageHash object.')
