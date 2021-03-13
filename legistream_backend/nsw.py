@@ -11,20 +11,20 @@ class Stream(object):
             self.__get_data(data_json)
         except:
             raise Exception('Unable to get JSON data: ' + data_json)
+        self.__get_stream_page()
 
     def __get_data(self, input_json):
         self.parsed_data = json.loads(get(input_json).text)['data']
     
-    @property
-    def are_streams(self):
+    def __get_stream_page(self):
         _html = BeautifulSoup(get('https://www.parliament.nsw.gov.au/Pages/webcasts.aspx').text, 'lxml').find('div', {'class': 'webcast-links'})
         try:
             if(_html.find('p').text == 'There are no active webcasts, on sitting days see the Daily Program to determine when proceedings begin.'):
-                return False
+                self.are_streams = False
             else:
-                return True
+                self.are_streams = True
         except:
-            return True
+            self.are_streams = True
 
 
     @property
