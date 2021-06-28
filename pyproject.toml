@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "legistream-backend"
-version = "1.4.16"
+version = "1.4.17"
 description = "Get live stream metadata from the various Australian parliaments."
 readme="README.md"
 authors = ["king-millez <millez.dev@gmail.com>"]
