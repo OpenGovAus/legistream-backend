@@ -35,7 +35,7 @@ class Stream(object):
     @property
     def lower_is_live(self):
         try:
-            if(abs(self.lower_img_hash - self.__get_vid_hash(self.lower_stream_url)) < 16384):
+            if(abs(self.lower_img_hash - self.__get_vid_hash(self.lower_stream_url)) < 16385):
                 return(False)
             else:
                 return(True)
@@ -44,7 +44,7 @@ class Stream(object):
         
     @property
     def upper_is_live(self):
-        if(abs(self.upper_img_hash - self.__get_vid_hash(self.upper_stream_url)) < 16384):
+        if(abs(self.upper_img_hash - self.__get_vid_hash(self.upper_stream_url)) < 16385):
             return(False)
         else:
             return(True)
@@ -75,6 +75,5 @@ class Stream(object):
         command = ['-ss', '00:00:00', '-i', seg_output_file, '-frames:v', '1', img_out]
         subprocess.run([common.ffmpeg_bin] + command, capture_output=True)
         _hash = int(str(imagehash.average_hash((Image.open(img_out)))), 16)
-        print('bruh', _hash)
         self.__cleanup(common.root_dir)
         return _hash
