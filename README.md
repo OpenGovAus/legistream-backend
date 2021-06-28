@@ -28,11 +28,17 @@ This package uses different modules to get live stream data from the various Aus
 
 ### Setup
 
-Install required packages with **pip3**:
+1. Install `poetry`:
 
-`pip3 install -r requirements.txt`
+    ```sh
+    pip3 install poetry
+    ```
 
----
+2. Install/update dependencies with `poetry`:
+
+    ```sh
+    poetry update
+    ```
 
 Install **ffmpeg**:
 
@@ -81,4 +87,10 @@ else:
 
 ## Notes
 
-The South Australia stream extractor uses code adapted from the [streamlink ustreamtv implementation](https://github.com/streamlink/streamlink/blob/master/src/streamlink/plugins/ustreamtv.py).
+1. Run all scripts using `poetry`:
+
+    ```sh
+    poetry run python3 [file].py
+    ```
+
+1. The South Australia stream extractor uses code adapted from the [streamlink ustreamtv implementation](https://github.com/streamlink/streamlink/blob/master/src/streamlink/plugins/ustreamtv.py).
