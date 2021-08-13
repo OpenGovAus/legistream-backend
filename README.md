@@ -1,16 +1,16 @@
 # legistream_backend
 
-This is the Python backend for legistream.
+This is the Python backend for Legistream.
 
 ---
 
-Install with **pip**:
+Install with `pip3`:
 
-`pip install legistream-backend`
+`pip3 install legistream-backend`
 
 View project on PyPI: [https://pypi.org/project/legistream-backend/](https://pypi.org/project/legistream-backend/).
 
-## Usage
+## Info
 
 This package uses different modules to get live stream data from the various Australian parliaments.
 
@@ -21,10 +21,6 @@ This package uses different modules to get live stream data from the various Aus
 - New South Wales
 - Northern Territory
 - Queensland
-- South Australia
-- Tasmania
-- Victoria
-- Western Australia
 
 ### Setup
 
@@ -40,57 +36,52 @@ This package uses different modules to get live stream data from the various Aus
     poetry update
     ```
 
-Install **ffmpeg**:
+3. Install **ffmpeg**:
 
-#### Linux
+    #### Linux
 
-`sudo apt install ffmpeg`
+    `sudo apt install ffmpeg`
 
-#### Mac
+    #### Mac
 
-Install with **brew**:
+    Install with **brew**:
 
-`brew install ffmpeg`
+    `brew install ffmpeg`
 
-#### Windows
+    #### Windows
 
-Official Windows builds of **ffmpeg** can be found [here](https://ffmpeg.org/download.html#build-windows)
+    Official Windows builds of **ffmpeg** can be found [here](https://ffmpeg.org/download.html#build-windows)
 
-### Print out stream URLs:
+### Usage
 
-Every parliament module returns data the same way, Victoria is used here only for example purposes.
+#### Interpreting the streams
 
-The `stream_urls` property can be used to return streams as a **dict**:
+Every parliament module returns data as a list of `StreamModel` objects. Each `StreamModel` has these 3 properties:
 
-```python
-from legistream_backend.vic import Stream
+- Stream URL: `string`
+- Stream title: `string`
+- Stream status (is this stream live?): `bool`
 
-print(Stream().stream_urls)
+### Loop through streams
+
+**Note**: The ACT is used here just as an example, this works for all the parliament modules.
+
+```py
+from legistream_backend.site.act import ACTStreamExtractor
+
+for stream in ACTStreamExtractor().streams:
+    print(stream.url,
+          stream.title,
+          stream.is_live
+    )
 ```
 
-Each URL can be returned individually by using the `[house]_stream_url` property (e.g `lower_stream_url`)
-
-```python
-print(Stream().lower_stream_url)
-```
-
-### Check if a parliament's house is live:
-
-Similarly, you can check the status of a live stream with the `[house]_is_live` boolean property.
-
-```python
-if(Stream().lower_is_live):
-    print('The lower house of Victoria is currently live.')
-else:
-    print('The lower house of Victoria is not currently live.')
-```
-
-## Notes
+### Notes
 
 1. Run all scripts using `poetry`:
 
     ```sh
-    poetry run python3 [file].py
+    poetry run python3 <file>.py
     ```
 
 1. The South Australia stream extractor uses code adapted from the [streamlink ustreamtv implementation](https://github.com/streamlink/streamlink/blob/master/src/streamlink/plugins/ustreamtv.py).

@@ -30,7 +30,8 @@ class StreamExtractor(object):
         try:
             return BeautifulSoup(page_content, 'lxml')
         except Exception as e:
-            raise self.ExtractorError('Could not parse page with bs4; ' + str(e))
+            raise self.ExtractorError(
+                'Could not parse page with bs4; ' + str(e))
 
     def _download_m3u8(self, url, postdata={}, method='GET', verify=True):
         page_content = self._download_page(
@@ -38,7 +39,8 @@ class StreamExtractor(object):
         try:
             return m3u8.parse(page_content)
         except Exception as e:
-            raise self.ExtractorError('Could not parse response as M3U8 playlist; ' + str(e))
+            raise self.ExtractorError(
+                'Could not parse response as M3U8 playlist; ' + str(e))
 
     def _get_timestamp(self, text, pattern):
         return int(datetime.strptime(text, pattern).timestamp())
