@@ -47,6 +47,7 @@ def test_parliament(parl_module):
         assert isinstance(stream, StreamModel)
         assert isinstance(stream.is_live, bool)
         assert isinstance(stream.title, str)
+        assert isinstance(stream.thumb, str)
 
         if stream.is_live:
             assert isinstance(stream.url, str)

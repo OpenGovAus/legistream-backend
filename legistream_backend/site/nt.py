@@ -44,7 +44,8 @@ class NTStreamExtractor(StreamExtractor):
         model = StreamModel(
             url=stream_url.replace('SD', 'HD'),
             is_live=is_live,
-            title='Legislative Assembly'
+            title='Legislative Assembly',
+            thumb='nt_la.webp'
         )
 
         return [model]

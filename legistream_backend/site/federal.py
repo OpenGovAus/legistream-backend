@@ -44,10 +44,18 @@ class FEDERALStreamExtractor(StreamExtractor):
                 f'getUniversalPlayerConfig?videoID={video_id}&format=json')[
                     'media']['renditions'][0]['url']
 
+            if stream_title == 'House of Representatives':
+                thumb = 'fed_hor.webp'
+            elif stream_title == 'Senate':
+                thumb = 'fed_sen.webp'
+            else:
+                thumb = 'fed_placeholder.webp'
+
             model = StreamModel(
                 url=stream_url,
                 is_live=True,
-                title=stream_title
+                title=stream_title,
+                thumb=thumb
             )
             final_list.append(model)
 

@@ -61,6 +61,7 @@ Every parliament module returns data as a list of `StreamModel` objects. Each `S
 - Stream URL: `string`
 - Stream title: `string`
 - Stream status (is this stream live?): `bool`
+- Stream thumbnail URL (for use in conjuction with [legistream-site](https://github.com/OpenGovAus/legistream-site))
 
 ### Loop through streams
 

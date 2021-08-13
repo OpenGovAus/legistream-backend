@@ -51,11 +51,18 @@ class NSWStreamExtractor(StreamExtractor):
 
             if stream_title in ['Jubilee Room', 'Macquarie Room'] and is_live:
                 is_live = False
+                thumb = 'nsw_com.webp'
+            elif stream_title == 'Legislative Assembly':
+                thumb = 'nsw_la.webp'
+            else:
+                thumb = 'nsw_lc.webp'
+
 
             model = StreamModel(
                 url=stream_url,
                 is_live=is_live,
-                title=stream_title
+                title=stream_title,
+                thumb=thumb
             )
 
             streams_list.append(model)

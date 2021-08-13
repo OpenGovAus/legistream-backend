@@ -30,7 +30,8 @@ class ACTStreamExtractor(StreamExtractor):
         model = StreamModel(
             url=url,
             is_live=is_live,
-            title='Legislative Assembly'
+            title='Legislative Assembly',
+            thumb='act_la.webp'
         )
 
         return [model]

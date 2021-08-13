@@ -33,17 +33,24 @@ class QLDStreamExtractor(StreamExtractor):
                 str(watch_page)).group(1)
 
             stream_title = self._parse_cal(
-                f'{self.BASE}/TV/PartialCalendar')
-            print(stream_title)
+                f'{self.BASE}/TV/PartialCalendar') \
+                .replace('House Sitting Date', 'Legislative Assembly')
+
         else:
             is_live = False
             stream_url = ''
             stream_title = ''
 
+        if stream_title == 'Legislative Assembly':
+            thumb = 'qld_la.webp'
+        else:
+            thumb = 'qld_generic.webp'
+
         model = StreamModel(
             url=stream_url,
             is_live=is_live,
-            title=stream_title
+            title=stream_title,
+            thumb=thumb
         )
 
         return [model]
