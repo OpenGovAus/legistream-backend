@@ -6,7 +6,7 @@ from legistream_backend import StreamExtractor
 from legistream_backend.util.models import StreamModel
 
 
-class StreamExtractor(StreamExtractor):
+class FEDERALStreamExtractor(StreamExtractor):
 
     @property
     def extractor_name(self):
@@ -36,12 +36,14 @@ class StreamExtractor(StreamExtractor):
                 info_block['onclick']).group(1)
 
             video_id = re.search(r'videoID=([0-9]+)', self._download_html(
-                f'{self.BASE_URL}{stream_page_url}') \
+                f'{self.BASE_URL}{stream_page_url}')
                     .find('iframe', {'title': 'Media player'})['src']).group(1)
 
-            stream_url = self._download_json(f'https://api-v3.switchmedia.asia/277/playback/' \
-                                            f'getUniversalPlayerConfig?videoID={video_id}&format=json') \
-                                                ['media']['renditions'][0]['url']
+            stream_url = self._download_json(
+                f'https://api-v3.switchmedia.asia/277/playback/'
+                f'getUniversalPlayerConfig?videoID={video_id}&format=json')[
+                    'media']['renditions'][0]['url']
+
             model = StreamModel(
                 url=stream_url,
                 is_live=True,

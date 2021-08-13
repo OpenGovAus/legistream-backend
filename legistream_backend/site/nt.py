@@ -8,7 +8,7 @@ from legistream_backend import StreamExtractor
 from legistream_backend.util.models import StreamModel
 
 
-class StreamExtractor(StreamExtractor):
+class NTStreamExtractor(StreamExtractor):
 
     @property
     def extractor_name(self):
@@ -33,7 +33,8 @@ class StreamExtractor(StreamExtractor):
         for i in range(3):
             seg_lens.append(len(get(
                 stream_url.replace(
-                    'playlist.m3u8', '') + stream_segments[-(i + 1)]['uri']).content))
+                    'playlist.m3u8', '') + stream_segments[
+                        -(i + 1)]['uri']).content))
 
         if(any(seg_lens.count(element) > 1 for element in seg_lens)):
             is_live = False

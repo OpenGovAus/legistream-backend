@@ -6,7 +6,7 @@ from legistream_backend import StreamExtractor
 from legistream_backend.util.models import StreamModel
 
 
-class StreamExtractor(StreamExtractor):
+class NSWStreamExtractor(StreamExtractor):
 
     PREFIX = 'https://player-api.new.livestream.com/accounts/13067949/events/'
 
@@ -41,7 +41,8 @@ class StreamExtractor(StreamExtractor):
 
             try:
                 stream_data['name']
-                stream_url = ''  # When a playlist is present, the "name" key is not present.
+                stream_url = ''
+                # When a playlist is present, the "name" key is not present.
                 is_live = False
             except Exception:
                 stream_url = get(stream_data['secure_m3u8_url'],
