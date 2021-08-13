@@ -5,6 +5,9 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 
 
+requests.packages.urllib3.disable_warnings()
+
+
 class StreamExtractor(object):
 
     def _download_page(self, url, postdata={}, method='GET', verify=True):
