@@ -22,19 +22,27 @@ class QLDStreamExtractor(StreamExtractor):
         homepage = self._download_html(self.BASE)
 
         if re.search(r'IsBroadcasting=True', str(homepage)):
+            # TODO change this bit so it uses the JSON endpoint which is more accurate.
             is_live = True
             watch_page = self._download_html(
                 f'{self.BASE}/TV/PartialGetHomeContent?'
                 f'IsBroadcasting=True&Reference='
             )
-            stream_url = re.search(
+            search = re.search(
                 r"{ 'file': '(https?:\/\/[aA-zZ0-9\-\.\/]+"
                 r"@[0-9/aA-zZ]+\.m3u8)",
-                str(watch_page)).group(1)
+                str(watch_page))
+            
+            if search:
+                stream_url = search.group(1) 
 
-            stream_title = self._parse_cal(
-                f'{self.BASE}/TV/PartialCalendar') \
-                .replace('House Sitting Date', 'Legislative Assembly')
+                stream_title = self._parse_cal(
+                    f'{self.BASE}/TV/PartialCalendar') \
+                    .replace('House Sitting Date', 'Legislative Assembly')
+            else:
+                is_live = False
+                stream_url = ''
+                stream_title = ''
 
         else:
             is_live = False
