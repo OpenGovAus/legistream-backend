@@ -26,8 +26,17 @@ class FEDERALStreamExtractor(StreamExtractor):
                             'section', {'id': 't1-content-panel'}).find_all(
                             'div', {'class': 'row border-top'}):
 
-            info_block = stream_row.find(
-                'div', {'class': 'medium-7 columns'}).find('a')
+            try:
+                info_block = stream_row.find(
+                    'div', {'class': 'medium-7 columns'}).find('a')
+            except Exception:
+                final_list.append(StreamModel(
+                    url='',
+                    is_live=False,
+                    title='',
+                    thumb=''
+                ))
+                continue
 
             stream_title = info_block.contents[0].strip()
 
