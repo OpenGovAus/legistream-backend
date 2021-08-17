@@ -21,13 +21,13 @@ class NTStreamExtractor(StreamExtractor):
     def _get_streams(self) -> List[StreamModel]:
         stream_page = self._download_page(
             'https://parliament.nt.gov.au/about/broadcast/video-broadcast',
-            verify=False)
+            verify=False).text
 
         stream_url = re.search(
             r"videoSource = '(https[:/aA-zZ0-9\.]+)", stream_page).group(1)
 
         stream_segments = stream_segments = m3u8.parse(
-            self._download_page(stream_url))['segments']
+            self._download_page(stream_url).text)['segments']
 
         seg_lens = []
         for i in range(3):

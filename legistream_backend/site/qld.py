@@ -32,9 +32,9 @@ class QLDStreamExtractor(StreamExtractor):
                 r"{ 'file': '(https?:\/\/[aA-zZ0-9\-\.\/]+"
                 r"@[0-9/aA-zZ]+\.m3u8)",
                 str(watch_page))
-            
+
             if search:
-                stream_url = search.group(1) 
+                stream_url = search.group(1)
 
                 stream_title = self._parse_cal(
                     f'{self.BASE}/TV/PartialCalendar') \
