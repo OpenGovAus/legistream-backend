@@ -1,7 +1,6 @@
 from typing import List
 from datetime import datetime
-
-from requests import get
+from requests import head
 
 
 from legistream_backend import StreamExtractor
@@ -38,7 +37,8 @@ class VICStreamExtractor(StreamExtractor):
                     thumbnail = 'vic_com.webp'
 
                 stream_url = 'https:' + stream['source'][0]['src']
-                is_live = True if get(stream_url).status_code == 200 else False
+                is_live = True if head(stream_url).status_code == 200 \
+                    else False
                 streams_list.append(StreamModel(
                     url=stream_url,
                     thumb=thumbnail,

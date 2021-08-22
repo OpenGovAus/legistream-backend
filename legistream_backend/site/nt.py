@@ -2,6 +2,7 @@ import re
 import m3u8
 from typing import List
 from requests import get
+from requests import head
 
 
 from legistream_backend import StreamExtractor
@@ -31,10 +32,10 @@ class NTStreamExtractor(StreamExtractor):
 
         seg_lens = []
         for i in range(3):
-            seg_lens.append(len(get(
+            seg_lens.append(head(
                 stream_url.replace(
                     'playlist.m3u8', '') + stream_segments[
-                        -(i + 1)]['uri']).content))
+                        -(i + 1)]['uri']).headers['Content-Length'])
 
         if(any(seg_lens.count(element) > 1 for element in seg_lens)):
             is_live = False
