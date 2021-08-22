@@ -1,77 +1,49 @@
-import m3u8, json
+from typing import List
+from datetime import datetime
+
 from requests import get
-from requests.sessions import SessionRedirectMixin
 
-API_URL = 'https://www.parliament.vic.gov.au/video-streaming/v7/scripts/akamai_desktop.json?_=1612478772960'
 
-class Stream(object):
-    def __init__(self):
-        self.__get_api_data(API_URL)
+from legistream_backend import StreamExtractor
+from legistream_backend.util.models import StreamModel
 
-    def __get_api_data(self, url):
-        self.api_data = json.loads(get(url).text)
-    
-    def lower_stream(self):
-        return self.__get_stream('Assembly Live Broadcast - Desktop')
 
-    def upper_stream(self):
-        return self.__get_stream('Council Live Broadcast - Desktop')
+BASE = 'https://www.parliament.vic.gov.au'
 
-    def comm_stream(self):
-        return self.__get_stream('Committee Live Broadcast - Desktop')
 
-    def __get_stream(self, title):
-        for stream in self.api_data:
-            if(stream['title'] == title):
-                return stream
+class VICStreamExtractor(StreamExtractor):
 
     @property
-    def lower_stream_url(self):
-        try:
-            return f'https:{self.lower_stream()["checksrc"]}'.replace('400', '900')
-        except:
-            return None
+    def extractor_name(self):
+        return 'Victoria'
 
     @property
-    def lower_is_live(self):
-        try:
-            if(get(self.lower_stream_url).status_code != 200):
-                return False
-            else:
-                return True
-        except:
-            return False
+    def streams(self) -> List[StreamModel]:
+        return self._get_streams()
 
-    @property
-    def upper_stream_url(self):
-        try:
-            return f'https:{self.upper_stream()["checksrc"]}'.replace('400', '900')
-        except:
-            return None
+    def _get_streams(self) -> List[StreamModel]:
+        timestamp = int(datetime.now().timestamp())
+        api_json = self._download_json(f'{BASE}/video-streaming/v7/scripts/ak'
+                                       f'amai_desktop.json?_={timestamp}')
+        streams_list = []
+        if len(api_json) > 0:
+            for stream in api_json:
+                stream_title = stream['title'].replace(' - Desktop', '')
 
-    @property
-    def upper_is_live(self):
-        try:
-            if(get(self.upper_stream_url).status_code != 200):
-                return False
-            else:
-                return True
-        except:
-            return False
+                if 'Council' in stream_title:
+                    thumbnail = 'vic_lc.webp'
+                elif 'Assembly' in stream_title:
+                    thumbnail = 'vic_la.webp'
+                else:
+                    thumbnail = 'vic_com.webp'
 
-    @property
-    def committee_stream_url(self):
-        try:
-            return f'https:{self.comm_stream()["checksrc"]}'.replace('400', '900')
-        except:
-            return None
+                stream_url = 'https:' + stream['source'][0]['src']
+                is_live = True if get(stream_url).status_code == 200 else False
+                streams_list.append(StreamModel(
+                    url=stream_url,
+                    thumb=thumbnail,
+                    is_live=is_live,
+                    title=stream_title
+                ))
 
-    @property
-    def committee_is_live(self):
-        try:
-            if(get(self.committee_stream_url).status_code != 200):
-                return False
-            else:
-                return True
-        except:
-            return False
+        return streams_list
