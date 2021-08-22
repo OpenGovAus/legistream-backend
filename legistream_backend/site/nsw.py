@@ -57,7 +57,6 @@ class NSWStreamExtractor(StreamExtractor):
             else:
                 thumb = 'nsw_lc.webp'
 
-
             model = StreamModel(
                 url=stream_url,
                 is_live=is_live,

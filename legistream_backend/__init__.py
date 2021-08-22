@@ -3,7 +3,6 @@ import json
 import requests
 from datetime import datetime
 from bs4 import BeautifulSoup
-from requests.api import head
 
 
 requests.packages.urllib3.disable_warnings()
@@ -11,18 +10,26 @@ requests.packages.urllib3.disable_warnings()
 
 class StreamExtractor(object):
 
-    def _download_page(self, url, postdata={}, headers={}, method='GET', verify=True):
+    def _download_page(self, url, postdata={}, headers={}, method='GET',
+                       verify=True):
         if method == 'GET':
             return requests.get(url, verify=verify, headers=headers)
         elif method == 'POST':
-            return requests.post(url, data=postdata, headers=headers, verify=verify)
+            return requests.post(
+                url,
+                data=postdata,
+                headers=headers,
+                verify=verify
+            )
         else:
             raise self.ExtractorError(
                 "Invalid request method used, requires 'GET' or 'POST'")
 
-    def _download_json(self, url, postdata={}, headers={}, method='GET', verify=True):
+    def _download_json(self, url, postdata={}, headers={}, method='GET',
+                       verify=True):
         page_content = self._download_page(
-            url, method=method, headers=headers, postdata=postdata, verify=verify).text
+            url, method=method, headers=headers, postdata=postdata,
+            verify=verify).text
         try:
             return json.loads(page_content)
         except Exception as e:

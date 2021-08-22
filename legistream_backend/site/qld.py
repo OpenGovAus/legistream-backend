@@ -22,7 +22,8 @@ class QLDStreamExtractor(StreamExtractor):
         homepage = self._download_html(self.BASE)
 
         if re.search(r'IsBroadcasting=True', str(homepage)):
-            # TODO change this bit so it uses the JSON endpoint which is more accurate.
+            # TODO change this bit so it uses the JSON endpoint,
+            # which is more accurate.
             is_live = True
             watch_page = self._download_html(
                 f'{self.BASE}/TV/PartialGetHomeContent?'
