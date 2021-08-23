@@ -37,8 +37,18 @@ class VICStreamExtractor(StreamExtractor):
                     thumbnail = 'vic_com.webp'
 
                 stream_url = 'https:' + stream['source'][0]['src']
-                is_live = True if head(stream_url).status_code == 200 \
-                    else False
+                if head(stream_url).status_code == 200:
+                    master = self._download_m3u8(stream_url)
+                    try:
+                        playlists = master['playlists'][0]['uri']
+                        master_playlist = stream_url.replace(
+                            'master.m3u8', playlists
+                        )
+                        is_live = True if head(master_playlist).status_code \
+                            == 200 else False
+                    except Exception:
+                        is_live = False
+
                 streams_list.append(StreamModel(
                     url=stream_url,
                     thumb=thumbnail,
