@@ -1,79 +1,121 @@
-import os
-import m3u8
-import subprocess
-import imagehash
-import shutil
-
-from PIL import Image
-from requests import get
-from bs4 import BeautifulSoup
 from datetime import datetime
-
-from legistream_backend import common
-from legistream_backend.util.fileutils import check_tempdir
+from typing import List
 
 
-filepath = os.path.dirname(os.path.realpath(__file__))
+from legistream_backend import StreamExtractor
+from legistream_backend.util.models import StreamModel
 
-class Stream(object):
-    lower_img_hash = 18446744069414592512
-    upper_img_hash = 18446743326385257472
-    
+
+BASE = 'https://www.parliament.tas.gov.au'
+
+
+class SittingCalendar(StreamExtractor):
+
+    def __init__(self, homepage: str) -> None:
+        self.url = homepage
+        self.days = dict()
+        for week in self._download_html(homepage).find(
+            'table',
+            {
+                'id': 'calendar'
+            }
+        ).find_all('tr')[1:]:
+            for index, day in enumerate(week.find_all('td')):
+                day_dict = {
+                    'lower': False,
+                    'upper': False
+                }
+                try:
+                    if day.has_attr('class'):
+                        if day['class'] == ['Both']:
+                            day_dict['lower'] = True
+                            day_dict['upper'] = True
+                        elif day['class'] == ['HA']:
+                            day_dict['lower'] = True
+                        elif day['class'] == ['LC']:
+                            day_dict['upper'] = True
+                        else:
+                            raise ValueError('Unrecognised day type: '
+                                             f'{day["class"]}.')
+                    self.days[self.timestamp(day.text)] = day_dict
+                except ValueError:
+                    pass  # Blank text for this day
+
+    def __str__(self):
+        return f"<Parliament Calendar | URL: '{self.url}'>"
+
+    def __repr__(self):
+        return ('<{}.{} : {} object at {}>'.format(
+            self.__class__.__module__,
+            self.__class__.__name__,
+            self.url,
+            hex(id(self))))
+
+    def timestamp(self, day):
+        return self._get_timestamp(
+            f'{day} {datetime.now().month} {datetime.now().year}',
+            '%d %m %Y'
+        )
+
     @property
-    def lower_stream_url(self):
-        return BeautifulSoup(get('https://www.parliament.tas.gov.au/TBS/havideo.html').text, 'lxml').find('source')['src']
+    def all_days(self):
+        return self.days
 
     @property
-    def upper_stream_url(self):
-        return BeautifulSoup(get('https://www.parliament.tas.gov.au/TBS/LCvideo.html').text, 'lxml').find('source')['src']
+    def sitting_days(self):
+        return [x for x in self.all_days.keys() if
+                any(self.all_days[x].values())]
+
+
+class TASStreamExtractor(StreamExtractor):
 
     @property
-    def stream_urls(self):
-        return({'lower': self.lower_stream_url, 'upper': self.upper_stream_url})
-
+    def extractor_name(self) -> str:
+        return 'Tasmania'
 
     @property
-    def lower_is_live(self):
-        try:
-            if(abs(self.lower_img_hash - self.__get_vid_hash(self.lower_stream_url)) < 16385):
-                return(False)
+    def streams(self) -> List[StreamModel]:
+        return self._get_streams()
+
+    def detect_live(self, house: str, cal: SittingCalendar):
+        assert isinstance(cal, SittingCalendar)
+        time = datetime.now()
+        today_timestamp = self._get_timestamp(
+            f'{time.year} {time.month} {time.day}',
+            '%Y %m %d'
+        )
+        return cal.all_days[today_timestamp][house]
+
+    def _get_streams(self) -> List[StreamModel]:
+        parl_calendar = SittingCalendar(BASE)
+        cast_pages = ['havideo', 'LCvideo', 'com1tbs', 'com2tbs']
+        STREAM_BASE = BASE + '/TBS/'
+
+        streams_list = []
+        for address in cast_pages:
+            cast_url = f'{STREAM_BASE}{address}.html'
+            page = self._download_html(cast_url).find('main')
+            stream_title = page.find('h2').text.replace(
+                'Parliament of Tasmania - ', '').replace(
+                    ' Webcast', '').strip()
+            if 'Committee' in stream_title:
+                stream_thumb = 'tas_com.webp'
+                stream_stat = False  # TODO get status of committee streams.
+            elif 'Assembly' in stream_title:
+                stream_thumb = 'tas_ha.webp'
+                stream_stat = self.detect_live('lower', parl_calendar)
+            elif 'Council' in stream_title:
+                stream_thumb = 'tas_lc.webp'
+                stream_stat = self.detect_live('upper', parl_calendar)
             else:
-                return(True)
-        except Exception:
-            return False
-        
-    @property
-    def upper_is_live(self):
-        if(abs(self.upper_img_hash - self.__get_vid_hash(self.upper_stream_url)) < 16385):
-            return(False)
-        else:
-            return(True)
+                raise ValueError('Could not detect thumbnail '
+                                 f'for "{stream_title}".')
+            stream_url = page.find('source')['src']
+            streams_list.append(StreamModel(
+                url=stream_url,
+                is_live=stream_stat,
+                title=stream_title,
+                thumb=stream_thumb
+            ))
 
-    def __cleanup(self, directory): # Clear Legistream's temp directory
-        try:
-            if(os.path.exists(directory)):
-                shutil.rmtree(directory)
-        except Exception as e:
-            print(e)
-
-    def __get_vid_hash(self, input_url):
-        check_tempdir(common.root_dir)
-        try:
-            playlist_data = m3u8.loads(get(input_url).text)
-        except Exception:
-            return None
-        seg_uri = m3u8.loads(get(input_url.replace('playlist.m3u8', '') + playlist_data.data['playlists'][0]['uri']).text).data['segments'][-1]['uri']
-        seg_ts = get(input_url.replace('playlist.m3u8', '') + seg_uri)
-        current_time = str(datetime.now()).replace(':', '-').replace('.', '-').replace(' ', '_')
-
-        seg_output_file = common.root_dir + current_time + '_tas_seg.ts'
-        with open(seg_output_file, 'wb') as file:
-            file.write(seg_ts.content)
-        
-        img_out = common.root_dir + current_time + '_tas_seg_out.jpg'
-        
-        command = ['-ss', '00:00:00', '-i', seg_output_file, '-frames:v', '1', img_out]
-        subprocess.run([common.ffmpeg_bin] + command, capture_output=True)
-        _hash = int(str(imagehash.average_hash((Image.open(img_out)))), 16)
-        self.__cleanup(common.root_dir)
-        return _hash
+        return streams_list
