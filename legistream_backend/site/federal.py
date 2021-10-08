@@ -24,8 +24,8 @@ class FEDERALStreamExtractor(StreamExtractor):
             f'{self.BASE_URL}/Watch_Read_Listen')
         try:
             for stream_row in homepage.find(
-                                'section', {'id': 't1-content-panel'}).find_all(
-                                'div', {'class': 'row border-top'}):
+                                'section', {'id': 't1-content-panel'}) \
+                                .find_all('div', {'class': 'row border-top'}):
 
                 try:
                     info_block = stream_row.find(
@@ -47,11 +47,13 @@ class FEDERALStreamExtractor(StreamExtractor):
 
                 video_id = re.search(r'videoID=([0-9]+)', self._download_html(
                     f'{self.BASE_URL}{stream_page_url}')
-                        .find('iframe', {'title': 'Media player'})['src']).group(1)
+                        .find('iframe', {'title': 'Media player'})['src']) \
+                    .group(1)
 
                 stream_url = self._download_json(
                     f'https://api-v3.switchmedia.asia/277/playback/'
-                    f'getUniversalPlayerConfig?videoID={video_id}&format=json')[
+                    f'getUniversalPlayerConfig?videoID={video_id}&f'
+                    f'ormat=json')[
                         'media']['renditions'][0]['url']
 
                 if stream_title == 'House of Representatives':

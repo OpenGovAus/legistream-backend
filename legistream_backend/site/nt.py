@@ -1,7 +1,6 @@
 import re
 import m3u8
 from typing import List
-from requests import get
 from requests import head
 
 
