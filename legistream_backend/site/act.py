@@ -1,8 +1,12 @@
+import datetime
 from typing import List
 
 
 from legistream_backend import StreamExtractor
 from legistream_backend.util.models import StreamModel
+
+
+BASE = 'https://aod.parliament.act.gov.au/'
 
 
 class ACTStreamExtractor(StreamExtractor):
@@ -17,20 +21,30 @@ class ACTStreamExtractor(StreamExtractor):
 
     def _get_streams(self) -> List[StreamModel]:
         api_return = self._download_json(
-            'https://aod.parliament.act.gov.au/api/video',
+            BASE + 'api/video',
             verify=False)['live']
 
         url = api_return['url'] + api_return['extension']
-        m3u8_return = self._download_m3u8(url, verify=False)
 
+        stream_title = 'Legislative Assembly'
         is_live = False
-        if len(m3u8_return['playlists']) > 0:
-            is_live = True
+        sitting_types = ['session', 'hearing']
+        date_timestamp = int(self._get_timestamp(
+            str(datetime.date.today()), '%Y-%m-%d'))
+        for sitting_type in sitting_types:
+            sitting_data = self._download_json(
+                BASE + f'api/{sitting_type}/next')
+            for date in sitting_data:
+                timestamp = int(self._get_timestamp(date['date'], '%Y-%m-%d'))
+                if timestamp == date_timestamp:
+                    is_live = True
+                    if len(date['description']) > 0:
+                        stream_title = date['description']
 
         model = StreamModel(
             url=url,
             is_live=is_live,
-            title='Legislative Assembly',
+            title=stream_title,
             thumb='act_la.webp'
         )
 
