@@ -17,6 +17,7 @@ ImageHash = "^4.2.0"
 websocket = "^0.2.1"
 websocket-client = "^1.1.0"
 lxml = "^4.6.3"
+websockets = "^9.1"
 
 [tool.poetry.dev-dependencies]
 
